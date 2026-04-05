@@ -240,11 +240,63 @@ body{display:flex;flex-direction:column;}
 .emoji-opt{font-size:22px;cursor:pointer;padding:4px;border-radius:6px;border:2px solid transparent;transition:all 0.1s;}
 .emoji-opt.selected{border-color:var(--navy);background:rgba(10,22,40,0.08);}
 .emoji-opt:active{background:var(--gray-100);}
+/* LOGIN SCREEN */
+.login-screen{position:fixed;inset:0;background:linear-gradient(160deg,var(--navy) 0%,var(--navy3) 100%);z-index:999;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;}
+.login-logo{font-size:56px;margin-bottom:8px;}
+.login-title{color:white;font-size:26px;font-weight:800;letter-spacing:-0.5px;margin-bottom:4px;}
+.login-sub{color:rgba(255,255,255,0.5);font-size:13px;margin-bottom:36px;}
+.login-card{background:white;border-radius:20px;padding:28px 24px;width:100%;max-width:360px;box-shadow:0 20px 60px rgba(0,0,0,0.3);}
+.login-label{font-size:11px;font-weight:700;color:var(--gray-400);text-transform:uppercase;letter-spacing:0.6px;display:block;margin-bottom:6px;}
+.login-input{width:100%;padding:13px 14px;border:1.5px solid var(--gray-200);border-radius:var(--radius-sm);font-size:16px;font-family:inherit;color:var(--gray-800);background:var(--gray-50);margin-bottom:14px;transition:border-color 0.15s;}
+.login-input:focus{outline:none;border-color:var(--navy);background:white;}
+.login-btn{width:100%;padding:15px;border-radius:var(--radius-sm);border:none;background:var(--navy);color:white;font-size:16px;font-weight:700;cursor:pointer;margin-top:4px;transition:opacity 0.15s;}
+.login-btn:active{opacity:0.85;}
+.login-error{background:var(--red-light);color:var(--red);font-size:12px;font-weight:600;padding:10px 12px;border-radius:var(--radius-sm);margin-bottom:12px;display:none;border:1px solid #fbc9c9;text-align:center;}
+.login-blocked{background:var(--amber-light);color:var(--amber);font-size:12px;font-weight:600;padding:10px 12px;border-radius:var(--radius-sm);margin-bottom:12px;display:none;border:1px solid #fde8b8;text-align:center;}
+.login-forgot{text-align:center;margin-top:16px;font-size:13px;color:var(--gray-400);}
+.login-forgot span{color:var(--navy);font-weight:600;cursor:pointer;}
 </style>
 </head>
 <body>
 
 <div class="safe-top"></div>
+
+<!-- LOGIN SCREEN -->
+<div id="login-screen" class="login-screen" style="display:none;">
+  <div class="login-logo">🏦</div>
+  <div class="login-title">FamilyFinance</div>
+  <div class="login-sub">Tu finanzas familiares, seguras</div>
+  <div class="login-card">
+    <div id="login-blocked" class="login-blocked">🔒 Cuenta bloqueada. Revisa tu correo para desbloquearla.</div>
+    <div id="login-error" class="login-error">❌ Contraseña incorrecta. Te quedan <span id="attempts-left">3</span> intentos.</div>
+    <label class="login-label">Usuario</label>
+    <input class="login-input" id="login-user" type="text" placeholder="Tu nombre de usuario" autocomplete="username" />
+    <label class="login-label">Password</label>
+    <input class="login-input" id="login-pass" type="password" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()" />
+    <button class="login-btn" onclick="doLogin()">Entrar</button>
+    <div class="login-forgot">¿Olvidaste tu contraseña? <span onclick="sendResetEmail()">Enviar correo de recuperación</span></div>
+  </div>
+</div>
+
+<!-- FIRST TIME SETUP -->
+<div id="setup-screen" style="position:fixed;inset:0;background:linear-gradient(160deg,var(--navy) 0%,var(--navy3) 100%);z-index:999;display:none;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;">
+  <div style="color:rgba(255,255,255,0.5);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:8px;">Primera vez</div>
+  <div style="font-size:56px;margin-bottom:12px;">🏦</div>
+  <div style="color:white;font-size:22px;font-weight:800;margin-bottom:8px;text-align:center;">Bienvenido a FamilyFinance</div>
+  <div style="color:rgba(255,255,255,0.55);font-size:13px;margin-bottom:28px;text-align:center;line-height:1.6;">Crea tu usuario y contraseña para proteger tu información</div>
+  <div style="background:white;border-radius:20px;padding:28px 24px;width:100%;max-width:360px;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+    <label class="login-label">Nombre de usuario</label>
+    <input class="login-input" id="setup-user" type="text" placeholder="Ej: familia2026" autocomplete="username"/>
+    <label class="login-label">Correo electrónico</label>
+    <input class="login-input" id="setup-email" type="email" placeholder="Para recuperar contraseña" autocomplete="email"/>
+    <label class="login-label">Password</label>
+    <input class="login-input" id="setup-pass" type="password" placeholder="Mínimo 6 caracteres" autocomplete="new-password"/>
+    <label class="login-label">Confirmar password</label>
+    <input class="login-input" id="setup-pass2" type="password" placeholder="Repite la contraseña" autocomplete="new-password" onkeydown="if(event.key==='Enter')doSetup()"/>
+    <div id="setup-error" style="background:var(--red-light);color:var(--red);font-size:12px;font-weight:600;padding:10px 12px;border-radius:var(--radius-sm);margin-bottom:12px;display:none;text-align:center;border:1px solid #fbc9c9;"></div>
+    <button class="login-btn" onclick="doSetup()">Crear cuenta</button>
+  </div>
+</div>
 
 <!-- HEADER -->
 <div class="header">
@@ -672,6 +724,20 @@ body{display:flex;flex-direction:column;}
       <!-- DANGER ZONE -->
       <div class="settings-section">
         <div class="settings-title">⚠️ Danger Zone</div>
+        <div class="settings-row">
+          <div>
+            <div class="settings-row-label">🔑 Change Password</div>
+            <div class="settings-row-sub">Actualiza tu contraseña de acceso</div>
+          </div>
+          <button class="settings-btn" onclick="changePassword()">Cambiar</button>
+        </div>
+        <div class="settings-row">
+          <div>
+            <div class="settings-row-label">🚪 Log Out</div>
+            <div class="settings-row-sub">Cierra la sesión en este dispositivo</div>
+          </div>
+          <button class="settings-btn" onclick="logout()">Salir</button>
+        </div>
         <div class="settings-row">
           <div>
             <div class="settings-row-label">Reset All Data</div>
@@ -1445,9 +1511,180 @@ function checkAutoBackup(){
 
 // ─── LOCAL BACKUP ─────────────────────────────────────────────────────────────
 
+// ─── AUTH ─────────────────────────────────────────────────────────────────────
+const MAX_ATTEMPTS = 5;
+const BLOCK_DURATION = 30 * 60 * 1000; // 30 minutos
+
+function hashPass(pass){
+  // Simple hash — sufficient for localStorage security
+  let hash=0;
+  for(let i=0;i<pass.length;i++){hash=((hash<<5)-hash)+pass.charCodeAt(i);hash|=0;}
+  return hash.toString(36)+'_'+pass.length;
+}
+
+function authInit(){
+  const user=ld('authUser',null);
+  if(!user){
+    // Primera vez — mostrar setup
+    document.getElementById('setup-screen').style.display='flex';
+    return;
+  }
+  // Verificar bloqueo
+  const blockedUntil=ld('authBlockedUntil',0);
+  if(Date.now()<blockedUntil){
+    document.getElementById('login-screen').style.display='flex';
+    document.getElementById('login-blocked').style.display='block';
+    document.getElementById('login-user').disabled=true;
+    document.getElementById('login-pass').disabled=true;
+    return;
+  }
+  // Sesión activa (menos de 8 horas)
+  const lastLogin=ld('authLastLogin',0);
+  if(Date.now()-lastLogin < 8*60*60*1000){
+    showApp(); return;
+  }
+  document.getElementById('login-screen').style.display='flex';
+  // Pre-fill username
+  const savedUser=ld('authUser',{});
+  if(savedUser.username) document.getElementById('login-user').value=savedUser.username;
+  setTimeout(()=>document.getElementById('login-pass').focus(),300);
+}
+
+function doSetup(){
+  const username=document.getElementById('setup-user').value.trim();
+  const email=document.getElementById('setup-email').value.trim();
+  const pass=document.getElementById('setup-pass').value;
+  const pass2=document.getElementById('setup-pass2').value;
+  const errEl=document.getElementById('setup-error');
+  errEl.style.display='none';
+  if(!username||!email||!pass||!pass2){errEl.textContent='Completa todos los campos';errEl.style.display='block';return;}
+  if(!email.includes('@')){errEl.textContent='Ingresa un correo válido';errEl.style.display='block';return;}
+  if(pass.length<6){errEl.textContent='La contraseña debe tener al menos 6 caracteres';errEl.style.display='block';return;}
+  if(pass!==pass2){errEl.textContent='Las contraseñas no coinciden';errEl.style.display='block';return;}
+  sv('authUser',{username,email,passHash:hashPass(pass)});
+  sv('authAttempts',0);sv('authLastLogin',Date.now());
+  document.getElementById('setup-screen').style.display='none';
+  showApp();
+}
+
+function doLogin(){
+  const blockedUntil=ld('authBlockedUntil',0);
+  if(Date.now()<blockedUntil) return;
+  const user=ld('authUser',null);
+  if(!user) return;
+  const inputUser=document.getElementById('login-user').value.trim();
+  const inputPass=document.getElementById('login-pass').value;
+  const errEl=document.getElementById('login-error');
+  errEl.style.display='none';
+  if(!inputPass){errEl.textContent='Ingresa tu contraseña';errEl.style.display='block';return;}
+  if(inputUser.toLowerCase()!==user.username.toLowerCase()){
+    errEl.innerHTML='❌ Usuario incorrecto.';errEl.style.display='block';return;
+  }
+  if(hashPass(inputPass)===user.passHash){
+    sv('authAttempts',0);sv('authLastLogin',Date.now());
+    document.getElementById('login-screen').style.display='none';
+    showApp();
+  } else {
+    let attempts=ld('authAttempts',0)+1;
+    sv('authAttempts',attempts);
+    const left=MAX_ATTEMPTS-attempts;
+    if(attempts>=MAX_ATTEMPTS){
+      sv('authBlockedUntil',Date.now()+BLOCK_DURATION);
+      errEl.style.display='none';
+      document.getElementById('login-blocked').style.display='block';
+      document.getElementById('login-blocked').innerHTML='🔒 Demasiados intentos fallidos. Cuenta bloqueada 30 minutos.<br>Revisa tu correo para desbloquearla.';
+      document.getElementById('login-user').disabled=true;
+      document.getElementById('login-pass').disabled=true;
+      sendBlockedEmail();
+    } else {
+      errEl.innerHTML='❌ Contraseña incorrecta. Te quedan <b>'+left+'</b> intento'+(left===1?'':'s')+'.';
+      errEl.style.display='block';
+      document.getElementById('login-pass').value='';
+      document.getElementById('login-pass').focus();
+    }
+  }
+}
+
+function sendResetEmail(){
+  const user=ld('authUser',null);
+  if(!user){alert('No hay cuenta configurada.');return;}
+  // Genera token temporal
+  const token=Math.random().toString(36).slice(2)+Date.now().toString(36);
+  sv('resetToken',token);sv('resetTokenExpiry',Date.now()+30*60*1000);
+  const resetLink=location.href.split('#')[0]+'#reset='+token;
+  const subject='FamilyFinance — Recuperación de contraseña';
+  const body=`Hola ${user.username},\n\nRecibiste este correo porque solicitaste recuperar tu contraseña de FamilyFinance.\n\nTu token de recuperación es:\n${token}\n\nPara restablecer tu contraseña, abre la app, ve a Settings → Change Password e ingresa este token.\n\nEste token expira en 30 minutos.\n\nSi no solicitaste esto, ignora este correo.`;
+  const mailtoLink=`mailto:${user.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  window.open(mailtoLink);
+  alert('📧 Se abrió tu app de correo con las instrucciones.\n\nEnvía ese correo a '+user.email+' y sigue las instrucciones para recuperar tu contraseña.');
+}
+
+function sendBlockedEmail(){
+  const user=ld('authUser',null);
+  if(!user||!user.email) return;
+  const token=Math.random().toString(36).slice(2)+Date.now().toString(36);
+  sv('resetToken',token);sv('resetTokenExpiry',Date.now()+60*60*1000);
+  const subject='FamilyFinance — Cuenta bloqueada';
+  const body=`Hola ${user.username},\n\nTu cuenta de FamilyFinance fue bloqueada por demasiados intentos fallidos.\n\nTu token para desbloquearla es:\n${token}\n\nAbre la app e ingresa este token cuando se te pida.\nExpira en 1 hora.`;
+  const mailtoLink=`mailto:${user.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  setTimeout(()=>window.open(mailtoLink),500);
+}
+
+function checkResetToken(){
+  const hash=location.hash;
+  if(!hash.includes('reset=')) return;
+  const token=hash.split('reset=')[1];
+  const savedToken=ld('resetToken','');
+  const expiry=ld('resetTokenExpiry',0);
+  if(token===savedToken&&Date.now()<expiry){
+    const newPass=prompt('Token válido ✅\n\nIngresa tu nueva contraseña (mínimo 6 caracteres):');
+    if(!newPass||newPass.length<6){alert('Contraseña muy corta. Intenta de nuevo.');return;}
+    const user=ld('authUser',{});
+    user.passHash=hashPass(newPass);
+    sv('authUser',user);
+    sv('authAttempts',0);
+    localStorage.removeItem('authBlockedUntil');
+    localStorage.removeItem('resetToken');
+    localStorage.removeItem('resetTokenExpiry');
+    alert('✅ Contraseña cambiada correctamente. Ya puedes iniciar sesión.');
+    location.hash='';
+    location.reload();
+  } else if(token){
+    alert('❌ Token inválido o expirado. Solicita uno nuevo desde la pantalla de login.');
+    location.hash='';
+  }
+}
+
+function showApp(){
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('setup-screen').style.display='none';
+  updateAll();
+  checkAutoBackup();
+}
+
+function changePassword(){
+  const user=ld('authUser',null);
+  if(!user) return;
+  const current=prompt('Ingresa tu contraseña actual:');
+  if(!current) return;
+  if(hashPass(current)!==user.passHash){alert('❌ Contraseña actual incorrecta.');return;}
+  const newPass=prompt('Ingresa tu nueva contraseña (mínimo 6 caracteres):');
+  if(!newPass||newPass.length<6){alert('Contraseña muy corta.');return;}
+  const confirm=prompt('Confirma tu nueva contraseña:');
+  if(newPass!==confirm){alert('❌ Las contraseñas no coinciden.');return;}
+  user.passHash=hashPass(newPass);
+  sv('authUser',user);
+  alert('✅ Contraseña cambiada correctamente.');
+}
+
+function logout(){
+  sv('authLastLogin',0);
+  location.reload();
+}
+
 // ─── INIT ─────────────────────────────────────────────────────────────────────
-updateAll();
-checkAutoBackup();
+checkResetToken();
+authInit();
 </script>
 </body>
 </html>
