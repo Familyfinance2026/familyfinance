@@ -1524,7 +1524,7 @@ function hashPass(pass){
 
 function authInit(){
   const user=ld('authUser',null);
-  if(!user){
+  if(!user||!user.username){
     // Primera vez — mostrar setup
     document.getElementById('setup-screen').style.display='flex';
     return;
@@ -1540,13 +1540,12 @@ function authInit(){
   }
   // Sesión activa (menos de 8 horas)
   const lastLogin=ld('authLastLogin',0);
-  if(Date.now()-lastLogin < 8*60*60*1000){
+  if(lastLogin>0 && Date.now()-lastLogin < 8*60*60*1000){
     showApp(); return;
   }
+  // Mostrar login
   document.getElementById('login-screen').style.display='flex';
-  // Pre-fill username
-  const savedUser=ld('authUser',{});
-  if(savedUser.username) document.getElementById('login-user').value=savedUser.username;
+  if(user.username) document.getElementById('login-user').value=user.username;
   setTimeout(()=>document.getElementById('login-pass').focus(),300);
 }
 
