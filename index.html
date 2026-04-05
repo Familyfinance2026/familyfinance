@@ -1343,13 +1343,12 @@ function gdSignIn(){
     return;
   }
   sv('gdClientId',clientId);
-  const redirectUri=encodeURIComponent(location.href.split('#')[0].split('?')[0]);
+  // Use exact current URL as redirect URI
+  const redirectUri=encodeURIComponent(location.href.split('#')[0]);
   const scope=encodeURIComponent(GD_SCOPES+' https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email');
   const authUrl=`https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=token&scope=${scope}&prompt=select_account`;
-  // Open OAuth in popup
   const w=500,h=600,left=(screen.width-w)/2,top=(screen.height-h)/2;
   const popup=window.open(authUrl,'gdauth',`width=${w},height=${h},left=${left},top=${top}`);
-  // Listen for redirect back
   const timer=setInterval(()=>{
     try{
       if(!popup||popup.closed){clearInterval(timer);return;}
